@@ -99,6 +99,12 @@ interface SpritesProps {
         dream_world: {
             front_default: string,
             front_female: string | null
+        },
+        home: {
+            front_default: string,
+            front_female: string | null,
+            front_shiny: string | null,
+            front_shiny_female: string | null,
         }
     }
 }

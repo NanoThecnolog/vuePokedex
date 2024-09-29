@@ -67,8 +67,6 @@ export default {
       <div class="cardContainer" v-for="pokemon in pokemons" :key="pokemon.id">
         <PokemonCard :pokemon="pokemon"/>               
       </div>
-
-    </section>
-    
+    </section>    
   </main>
 </template>
