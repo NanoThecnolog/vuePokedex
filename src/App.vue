@@ -14,16 +14,20 @@ export default {
     return {
       pokemons: [] as PokemonProps[],
       pokemonImages: [] as string[],
+      limit: 25,
+      offset: 0,
+      isLoading: false,
+      scrollThreshold: 300,
       
     };
   },
-  mounted() {
-    this.fetchPokemon();
-  },
+  
   methods: {
     async fetchPokemon() {
+      if (this.isLoading) return;
       try {
-        const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=200')
+        this.isLoading = true;        
+        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=${this.limit}&offset=${this.offset}`);
         //this.pokemons = response.data.results;
         
         const pokemonDataPromises = response.data.results.map((pokemon: PokemonProps) => {
@@ -31,37 +35,42 @@ export default {
         })
         
         const responseData = await Promise.all(pokemonDataPromises)
-        const pokemonData = responseData.map((pokemon) => {
-          return pokemon.data
-        })
-        this.pokemons = pokemonData
-        this.pokemonImages = this.pokemons.map((pokemon) => {
-          if (pokemon.sprites.front_default) {
-            return pokemon.sprites.front_default
-          } else {
-            return ""
-          }
-        })
-        //console.log(this.pokemonImages)
-        console.log(pokemonData)
-        
+        const pokemonData = responseData.map((pokemon) => pokemon.data)
 
+        this.pokemons = [...this.pokemons, ...pokemonData];
+        this.offset += this.limit;
         
+        //console.log(pokemonData)
       } catch (err) {
         console.log("Erro ao fazer a requisição", err)
+        
+      } finally {
+        this.isLoading = false;
       }
-    }
-  }
+    },
+    infinityScroll() {
+      const scrollPosition = window.scrollY + window.innerHeight;
+      const pageHeight = document.documentElement.scrollHeight;
+
+      if (pageHeight - scrollPosition < this.scrollThreshold) {
+        this.fetchPokemon();
+      }
+    },    
+  },
+  mounted() {
+    this.fetchPokemon();
+    window.addEventListener('scroll', this.infinityScroll)
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.infinityScroll)
+  },
 
 };
-
-
 </script>
 
 <template>
   <header>  
   </header>
-
   <main class="container">
     <section class="pokemonsContainer">      
       <div class="cardContainer" v-for="pokemon in pokemons" :key="pokemon.id">

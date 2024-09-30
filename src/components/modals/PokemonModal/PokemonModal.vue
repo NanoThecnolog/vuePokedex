@@ -6,6 +6,7 @@ import { faVenus } from '@fortawesome/free-solid-svg-icons';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faMars } from '@fortawesome/free-solid-svg-icons';
 import { faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 const colors: Record<string,string> = {
             fire: '#EC8484',
@@ -29,15 +30,16 @@ const colors: Record<string,string> = {
 }
 
 
+
 export default {
     components: {
         FontAwesomeIcon
     },
     props: {
         pokemon: {
-        type: Object as PropType<PokemonProps>,
-        required: true
-        }
+            type: Object as PropType<PokemonProps>,
+            required: true
+        },        
     },
     data() {
         return {
@@ -47,11 +49,14 @@ export default {
             faVolumeHigh,
             colors,
             pokeImage: "",
-            male: true
+            male: true,
+            evolutions: [] as EvosProps[]
+            
         }
     },
     mounted() {
         this.pokeImage = this.pokemon.sprites.other.home.front_default;
+        this.fetchEvos();
     },
     methods:{
         closeModal(){
@@ -72,6 +77,37 @@ export default {
             this.male = true
             if (this.pokemon.sprites.other.home.front_default)
             this.pokeImage = this.pokemon.sprites.other.home.front_default;
+        },
+        async fetchEvos() {
+            try {
+                const specie = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${this.pokemon.id}/`);
+                const evoChain = await axios.get(specie.data.evolution_chain.url);
+                
+                const chain = evoChain.data.chain;
+                const evolutions: string[] = [
+                    chain.species.name,
+                    chain.evolves_to?.[0]?.species.name || null,
+                    chain.evolves_to?.[0]?.evolves_to?.[0]?.species.name || null,
+                ].filter(Boolean)
+
+                const evoDataPromises = evolutions.map((pokemon) =>
+                    axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
+                );
+                const responseData = await Promise.all(evoDataPromises);
+                
+                const evos: EvosProps[] = responseData.map((chain) => {
+                    return {
+                        id: chain.data.id,
+                        name: chain.data.name,
+                        imageMale: chain.data.sprites.other.home?.front_default || "",
+                        imageFemale: chain.data.sprites.other.home?.front_female || ""
+                    }
+                });
+                this.evolutions = evos;               
+
+            } catch (err) {
+                console.log("Erro ao buscar evoluções", err)
+            }
         }
     }
 }
@@ -100,6 +136,10 @@ export default {
                             <font-awesome-icon v-if="male" :icon="faMars" />
                             <font-awesome-icon v-if="!male" :icon="faVenus" />
                         </div>
+                        <div class="moreInfo">
+                            <p>Altura: {{ pokemon.height / 10 }}m</p>
+                            <p>Peso: {{ pokemon.weight /10 }}kg</p>
+                        </div>
                     </div>
                     <div class="pokemonName">
                         <h2>{{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}}</h2>
@@ -120,24 +160,52 @@ export default {
                             <button @click="changeToMale" style="background-color: #a595ff; color: white"><font-awesome-icon :icon="faMars" /></button>
                             <button @click="changeToFemale" style="background-color: #ff95d3;"><font-awesome-icon :icon="faVenus" /></button>
                         </div>
-
                     </div>
                     
+                    
                 </div>
-                <div class="infoContainer">peso, altura colocar perto da imagem do pokemon?</div>
-                <div class="infoContainer">status, evoluções, moves, versões do jogo que aparece e os Ids de cada versão</div>
+                <div class="infoContainer">
+                    <div class="evoContainer">
+                        
+                        <div class="evo" v-for="evo in evolutions" :key="evo.id">
+                            
+                            <img :src="evo.imageMale" :alt="evo.name" width="100px">
+                            <p>#{{ evo.id.toString().padStart(4, '0') }} {{ evo.name }} </p>
+                        </div>                        
+                    </div>
+                    <div class="statusContainer">                        
+                        <div class="stats" v-for="stat in pokemon.stats" :key="stat.stat.name">
+                            <div class="statusTitle">
+                                <p>
+                                    {{ stat.stat.name === 'special-attack' ? 'SPA' :
+                                            stat.stat.name === 'special-defense' ? 'SPD' :
+                                                stat.stat.name === 'attack' ? 'ATK' :
+                                                    stat.stat.name === 'defense' ? 'DEF' :
+                                                        stat.stat.name === 'speed' ? 'SPD' :
+                                                            stat.stat.name.toUpperCase() }}
+                                </p>
+                            </div>
+                            <div class="values">
+                                <div class="colored" :style="{ height: stat.base_stat + 'px'}">
+                                    <p>{{ stat.base_stat }}</p>
+                                </div>                                
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="infoContainer">moves, versões do jogo que aparece e os Ids de cada versão</div>
             </div>
             
         </div>
     </div>
 
 </template>
-<style scoped>
+<style lang="scss" scoped>
 .container {
     width: 100%;
     height: 100vh;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.6);
     position: fixed;
@@ -146,155 +214,254 @@ export default {
     z-index: 99;
     cursor:auto;
 
-}
-.modalContainer{
-    background-color: #f8f8f8;
-    width: 80%;
-    height: 80%;
-    border-radius: 2rem;
-    padding: 12px;
-    color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    cursor:auto;
-}
-.closeButton{
-    border: none;
-    background-color: gray;
-    border-radius: 2rem;
-    width: 40px;
-    height: 40px;
-    position: absolute;
-    top: 2%;
-    right: 1%;
-    cursor: pointer;
-}
-.closeButton svg{
-    font-size: 30px;
-}
-.pokemonInfo{
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    
-    width: 100%;
-}
-.infoContainer{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    position: relative;
-    gap: 10px;
-}
-.crie{
-    position: absolute;
-    top: 10%;
-    left: 20%;
-    cursor: pointer;
-    background-color: white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: .4s;
-}
-.crie:hover{
-    transform: scale(1.2);
-}
-.imageContainer{
-    position: relative;
-    border-radius: 50%;
-}
-.pokemonImage{
-    width: 200px;
-    height: 200px;
-    object-fit: contain;
-    filter: drop-shadow(3px 1px 3px rgba(0, 0, 0, 0.5));
-    transition: .4s;
-}
-.gender{
-    position: absolute;
-    bottom: 0%;
-    left: -20%;
-    font-size: 20px;
-}
-.pokemonImage:hover{
-    transform: scale(1.2);
-}
-.pokemonName{
-    
-    width: 90%;
-    height: 50px;    
-    border-radius: .4rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    
-}
-.pokemonName h2{
-    font-weight: 700;
-    font-family: sans-serif;
-}
-.pokemonTypes{
-    width: 100%;
-    height: 50px;
-    display: flex;
-    justify-content: space-around;    
-    align-items: center;    
-}
-.pokemonTypes p{
-    width: 200px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 2rem;
-    font-size: 1.2rem;    
-}
-.pokemonAbilities{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    width: 50%;
-    padding-top: 20px;
-}
-.pokemonAbilities p{
-    background-color: #b6c9f1;
-    width: 80%;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 2rem;
 
-}
-.genderOptions{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    width: 50%;
-    gap: 12px;
-    padding-top: 20px;
-}
+    .modalContainer{
+        background-color: #f8f8f8;
+        width: 80%;
+        height: 70vh;
+        border-radius: 2rem;
+        padding: 50px;
+        color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        cursor:auto;
 
-.genderOptions button{
-    border: none;
-    border-radius: .4rem;
-    padding: 7px 36px;
-    font-size: 1.5rem;
-    transition: .4s;
-    cursor: pointer;
-}
-.genderOptions button:hover{
-    transform: scale(1.2);
+        .closeButton{
+            border: none;
+            background-color: gray;
+            border-radius: 2rem;
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            top: 2%;
+            right: 1%;
+            cursor: pointer;
+
+            svg{
+                    font-size: 30px;
+                }
+        }
+        .pokemonInfo{
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 20px;            
+            width: 100%;
+            height: 100%;
+
+            .infoContainer{
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+                position: relative;
+                gap: 10px;
+
+                .crie{
+                    position: absolute;
+                    top: 10%;
+                    left: 20%;
+                    cursor: pointer;
+                    background-color: white;
+                    border-radius: 50%;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    transition: .4s;
+
+                    &:hover{
+                        transform: scale(1.2)
+                    }                    
+                }
+                .imageContainer{
+                    position: relative;
+                    border-radius: 50%;
+
+                    .pokemonImage{
+                        width: 200px;
+                        height: 200px;
+                        object-fit: contain;
+                        filter: drop-shadow(3px 1px 3px rgba(0, 0, 0, 0.5));
+                        transition: .4s;
+
+                        &:hover{
+                            transform: scale(1.2);
+                        }
+                    }
+                    .gender{
+                        position: absolute;
+                        bottom: 0%;
+                        left: -20%;
+                        font-size: 20px;
+                    }
+                    .moreInfo{
+                        position: absolute;
+                        bottom: 0%;
+                        right: -50%;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-end;    
+
+                        p{
+                            font-weight: 700;
+                            font-family: var(--font-Roboto);
+                            font-style: italic;
+                        }
+                    }                   
+                }
+                .pokemonName{
+                    width: 90%;
+                    height: 50px;    
+                    border-radius: .4rem;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+
+                    h2{
+                        font-weight: 700;
+                        font-family: sans-serif;
+                    }
+                }
+                .pokemonTypes{
+                    width: 100%;
+                    height: 50px;
+                    display: flex;
+                    justify-content: space-around;    
+                    align-items: center;
+                    
+                    p{
+                        width: 200px;
+                        height: 40px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        border-radius: 2rem;
+                        font-size: 1.2rem;    
+                    }
+                }
+                .pokemonAbilities{
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    align-items: center;
+                    width: 50%;
+                    padding-top: 20px;
+
+                    p{
+                        background-color: #b6c9f1;
+                        width: 80%;
+                        height: 40px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        border-radius: 2rem;
+                    }
+                }                
+                .genderOptions{
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    align-items: center;
+                    width: 50%;
+                    gap: 12px;
+                    padding-top: 20px;
+
+                    button{
+                        border: none;
+                        border-radius: .4rem;
+                        padding: 7px 36px;
+                        font-size: 1.5rem;
+                        transition: .4s;
+                        cursor: pointer;
+
+                        &:hover{
+                            transform: scale(1.2);
+                        }
+                    }
+                }
+                .evoContainer{
+                    width: 100%;
+                    height: 100%;
+                    display: flex;                    
+                    justify-content: space-evenly;
+                    align-items: center;                    
+                    border: 1px solid red;
+                    
+                    
+                    .evo{
+                        display: flex;
+                        height: 100%;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+
+                        p{
+                            padding-top: 2rem;
+                        }
+                    }
+                }
+                .statusContainer{
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    background-color: #9cb7da;
+                    border-radius: .4rem;
+                    gap: 12px;
+                    padding: 5px;
+
+                    .stats{
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        align-items: center;
+                        text-align: center;
+                        //border: 1px solid red;
+                        height: 200px;
+                        width: 70px;
+                        background-color: #b6c9f1;
+                        border-radius: .4rem;
+
+                        .statusTitle{
+                            margin-top: 5px;
+                            background-color: #63db63;
+                            border-radius: 50%;
+                            width: 50px;
+                            height: 50px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            
+                        }
+
+                        .values{
+                            //border: 1px solid red;
+                            width: 100%;
+                            
+                            .colored{
+                            background-color: #0c4999;
+                            width: 100%;
+                            height: 100%;
+                            border-radius: 0 0 .4rem .4rem;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            color: white;
+                            }
+                        }
+
+                        
+                    }
+                }
+            }
+        }
+    }
 }
 </style>

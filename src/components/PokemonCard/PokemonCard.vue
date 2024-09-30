@@ -58,7 +58,7 @@ export default {
 <template>    
     <div class="card" :style="{ backgroundColor: colors[pokemon.types[0].type.name] || 'rgb(255, 146, 146)' }" @click="openModal">
         <div class="imageContainer">
-          <img class="image" v-if="pokemon.sprites.other.dream_world.front_default" :src="pokemon.sprites.other.dream_world.front_default" :alt="pokemon.name"/>
+          <img class="image" v-if="pokemon.sprites.other.home.front_default" :src="pokemon.sprites.other.home.front_default" :alt="pokemon.name"/>
         </div>          
         <div class="infoContainer">            
           <h1>{{ pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1) }}</h1>
@@ -79,6 +79,7 @@ export default {
     min-height: 300px;
     border-radius: 1rem;
     transition: .5s;
+    
 
     &:hover {
         transform: scale(1.1);
@@ -109,10 +110,8 @@ export default {
 
     .infoContainer {
         text-align: center;
+        text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3);
     }
 
-}
-.modal{
-  
 }
 </style>
