@@ -2,13 +2,15 @@
 import axios from 'axios';
 import type { PokemonProps } from './@types/pokemon';
 import PokemonCard from './components/PokemonCard/PokemonCard.vue';
+import Filtro from './components/Filtro/Filtro.vue';
 
 
 
 
 export default {
   components: {
-    PokemonCard
+    PokemonCard,
+    Filtro
   },
   data() {
     return {
@@ -69,7 +71,8 @@ export default {
 </script>
 
 <template>
-  <header>  
+  <header>
+    <Filtro/>
   </header>
   <main class="container">
     <section class="pokemonsContainer">      
@@ -79,3 +82,26 @@ export default {
     </section>    
   </main>
 </template>
+
+<style lang="scss" scoped>
+.container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 200px;
+
+  .pokemonsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    width: 90%;
+    gap: 20px;
+
+    .cardContainer {
+      cursor: pointer;
+    }
+  }
+}
+</style>

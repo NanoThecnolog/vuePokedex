@@ -12,14 +12,20 @@
   --vt-c-text-light: var(--vt-c-indigo);
   --vt-c-text-dark: rgba(235, 235, 235, 0.64);
 
-  --font-Roboto: "Roboto", sans-serif;
-}
-
-:root {
   --color-background: var(--vt-c-white);
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
   --color-text: var(--vt-c-text-light);
+
+  --font-Roboto: "Roboto", sans-serif;
+  --color-metalic: #2B2D42;
+  --color-gray: #92a9c7;
+  --color-white: #F8F9FA;
+  --color-black: #212121;
+  --color-celesticBlue: #48CAE4;
+  --color-red: #E63946;
+  --color-green: #4CAF50;
+  --color-yellow: #FFBA08;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -44,7 +50,7 @@ body {
   color: var(--color-text);
   background: var(--color-background-mute);
   transition:
-    color 0.5s,
+    color .2s,
     background-color 0.5s;
   line-height: 1.6;
   font-family:

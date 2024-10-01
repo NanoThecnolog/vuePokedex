@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { PokemonProps } from '@/@types/pokemon';
+import Moves from './Moves.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faVenus } from '@fortawesome/free-solid-svg-icons';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -33,7 +34,8 @@ const colors: Record<string,string> = {
 
 export default {
     components: {
-        FontAwesomeIcon
+        FontAwesomeIcon,
+        Moves
     },
     props: {
         pokemon: {
@@ -56,7 +58,7 @@ export default {
     },
     mounted() {
         this.pokeImage = this.pokemon.sprites.other.home.front_default;
-        this.fetchEvos();
+        this.fetchEvos();        
     },
     methods:{
         closeModal(){
@@ -103,7 +105,7 @@ export default {
                         imageFemale: chain.data.sprites.other.home?.front_female || ""
                     }
                 });
-                this.evolutions = evos;               
+                this.evolutions = evos;             
 
             } catch (err) {
                 console.log("Erro ao buscar evoluções", err)
@@ -123,22 +125,25 @@ export default {
             
             <div class="pokemonInfo">
                 <div class="infoContainer">
-                    <div>
+                    <div class="pokemonId">
                         <h3>#{{ pokemon.id.toString().padStart(4, '0') }}</h3>
                     </div>
-                    <div class="crie" @click="playCrie" v-if="pokemon.cries.latest">
-                        <audio ref="audioCrie" v-if="pokemon.cries.latest" :src="pokemon.cries.latest"></audio>
-                        <font-awesome-icon :icon="faVolumeHigh" />
-                    </div>
-                    <div class="imageContainer" :style="{backgroundColor: colors[pokemon.types[0].type.name]}">
-                        <img class="pokemonImage" v-if="pokeImage != ''" :src="pokeImage" :alt="pokemon.name">
-                        <div class="gender">
-                            <font-awesome-icon v-if="male" :icon="faMars" />
-                            <font-awesome-icon v-if="!male" :icon="faVenus" />
+                    
+                    <div class="backImage">
+                        <div class="crie" @click="playCrie" v-if="pokemon.cries.latest">
+                            <audio ref="audioCrie" v-if="pokemon.cries.latest" :src="pokemon.cries.latest"></audio>
+                            <font-awesome-icon :icon="faVolumeHigh" />
                         </div>
-                        <div class="moreInfo">
-                            <p>Altura: {{ pokemon.height / 10 }}m</p>
-                            <p>Peso: {{ pokemon.weight /10 }}kg</p>
+                        <div class="imageContainer" :style="{backgroundColor: colors[pokemon.types[0].type.name]}">
+                            <img class="pokemonImage" v-if="pokeImage != ''" :src="pokeImage" :alt="pokemon.name">
+                            <div class="gender">
+                                <font-awesome-icon v-if="male" :icon="faMars" />
+                                <font-awesome-icon v-if="!male" :icon="faVenus" />
+                            </div>
+                            <div class="moreInfo">
+                                <p>Altura: {{ pokemon.height / 10 }}m</p>
+                                <p>Peso: {{ pokemon.weight /10 }}kg</p>
+                            </div>
                         </div>
                     </div>
                     <div class="pokemonName">
@@ -165,13 +170,13 @@ export default {
                     
                 </div>
                 <div class="infoContainer">
+                    Evoluções
                     <div class="evoContainer">
-                        
-                        <div class="evo" v-for="evo in evolutions" :key="evo.id">
-                            
+                                                
+                        <div class="evo" v-for="evo in evolutions" :key="evo.id">                            
                             <img :src="evo.imageMale" :alt="evo.name" width="100px">
-                            <p>#{{ evo.id.toString().padStart(4, '0') }} {{ evo.name }} </p>
-                        </div>                        
+                            <p>#{{ evo.id.toString().padStart(4, '0') }} {{ evo.name }} </p>                            
+                        </div>              
                     </div>
                     <div class="statusContainer">                        
                         <div class="stats" v-for="stat in pokemon.stats" :key="stat.stat.name">
@@ -193,7 +198,17 @@ export default {
                         </div>                        
                     </div>
                 </div>
-                <div class="infoContainer">moves, versões do jogo que aparece e os Ids de cada versão</div>
+                <div class="infoContainer">
+                    <div class="moves">
+                        Movimentos:
+                        <Moves v-for="(move, index) in pokemon.moves" :key="index" :moves="move"/>
+                    </div>
+                    <div>
+                        versões do jogo que aparece e os Ids de cada versão
+                    </div>
+                
+                
+                </div>
             </div>
             
         </div>
@@ -205,7 +220,7 @@ export default {
     width: 100%;
     height: 100vh;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.6);
     position: fixed;
@@ -216,12 +231,13 @@ export default {
 
 
     .modalContainer{
-        background-color: #f8f8f8;
+        background-color: #2B2D42;        
         width: 80%;
         height: 70vh;
+        border: 5px double var(--color-red);
         border-radius: 2rem;
         padding: 50px;
-        color: black;
+        color: white;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -230,14 +246,19 @@ export default {
 
         .closeButton{
             border: none;
-            background-color: gray;
+            background-color: var(--color-red);
             border-radius: 2rem;
             width: 40px;
             height: 40px;
             position: absolute;
             top: 2%;
-            right: 1%;
+            left: 1%;
             cursor: pointer;
+            transition: .4s;
+
+            &:hover {
+                transform: scale(1.2);
+            }
 
             svg{
                     font-size: 30px;
@@ -261,12 +282,24 @@ export default {
                 position: relative;
                 gap: 10px;
 
+                .pokemonId{
+                    display: flex;
+                    justify-content: center;                    
+                    background-color: var(--color-black);
+                    width: 100px;
+                    border: 2px solid var(--color-red);
+                    border-radius: 2rem;
+
+                }
+
                 .crie{
                     position: absolute;
-                    top: 10%;
-                    left: 20%;
+                    top: 15%;
+                    left: 10%;
                     cursor: pointer;
-                    background-color: white;
+                    background-color: white;                    
+                    color: var(--color-metalic);
+                    border: 2px solid var(--color-red);
                     border-radius: 50%;
                     width: 30px;
                     height: 30px;
@@ -279,9 +312,19 @@ export default {
                         transform: scale(1.2)
                     }                    
                 }
-                .imageContainer{
+                .backImage{
+                    background: radial-gradient(circle, rgba(255,255,255, .3)10%, var(--color-metalic) 55%);
+                    width: 100%;
+                    height: 400px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
                     position: relative;
+
+                    .imageContainer{                    
                     border-radius: 50%;
+                    width: 230px;
+                    height: 230px;
 
                     .pokemonImage{
                         width: 200px;
@@ -296,14 +339,24 @@ export default {
                     }
                     .gender{
                         position: absolute;
-                        bottom: 0%;
-                        left: -20%;
+                        bottom: 15%;
+                        left: 10%;
                         font-size: 20px;
+                        background-color: var(--color-white);
+                        border: 2px solid var(--color-red);
+                        border-radius: 50%;
+                        width: 30px;
+                        height: 30px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        color: var(--color-metalic);
+                        
                     }
                     .moreInfo{
                         position: absolute;
                         bottom: 0%;
-                        right: -50%;
+                        right: 10%;
                         display: flex;
                         flex-direction: column;
                         align-items: flex-end;    
@@ -315,18 +368,24 @@ export default {
                         }
                     }                   
                 }
+                }
+                
                 .pokemonName{
-                    width: 90%;
-                    height: 50px;    
-                    border-radius: .4rem;
+                    width: 100%;
+                    height: 60px;
+                    border-radius: 2rem;
+                    background-color: var(--color-celesticBlue);
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
-                    align-items: center;
+                    align-items: center;                    
 
                     h2{
                         font-weight: 700;
                         font-family: sans-serif;
+                    }
+                    h4{
+                        font-weight: 700;
                     }
                 }
                 .pokemonTypes{
@@ -352,7 +411,7 @@ export default {
                     justify-content: space-around;
                     align-items: center;
                     width: 50%;
-                    padding-top: 20px;
+                    padding-top: 5px;
 
                     p{
                         background-color: #b6c9f1;
@@ -371,7 +430,7 @@ export default {
                     align-items: center;
                     width: 50%;
                     gap: 12px;
-                    padding-top: 20px;
+                    padding-top: 5px;
 
                     button{
                         border: none;
@@ -392,7 +451,7 @@ export default {
                     display: flex;                    
                     justify-content: space-evenly;
                     align-items: center;                    
-                    border: 1px solid red;
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.05) 55%, transparent 65%);
                     
                     
                     .evo{
@@ -402,6 +461,13 @@ export default {
                         justify-content: center;
                         align-items: center;
 
+                        img{
+                            transition: .4s;
+                            &:hover{
+                                transform: scale(1.3);
+                            }
+                        }
+
                         p{
                             padding-top: 2rem;
                         }
@@ -410,11 +476,9 @@ export default {
                 .statusContainer{
                     width: 100%;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    background-color: #9cb7da;
-                    border-radius: .4rem;
-                    gap: 12px;
+                    justify-content: space-evenly;
+                    align-items: center;                    
+                    border-radius: .4rem;                    
                     padding: 5px;
 
                     .stats{
@@ -424,14 +488,14 @@ export default {
                         align-items: center;
                         text-align: center;
                         //border: 1px solid red;
-                        height: 200px;
-                        width: 70px;
+                        height: 160px;
+                        width: 50px;
                         background-color: #b6c9f1;
-                        border-radius: .4rem;
+                        border-radius: 2.5rem 2.5rem .4rem .4rem;
 
                         .statusTitle{
-                            margin-top: 5px;
-                            background-color: #63db63;
+                            
+                            background-color: var(--color-celesticBlue);
                             border-radius: 50%;
                             width: 50px;
                             height: 50px;
@@ -446,10 +510,10 @@ export default {
                             width: 100%;
                             
                             .colored{
-                            background-color: #0c4999;
+                            background-color: #526886;
                             width: 100%;
                             height: 100%;
-                            border-radius: 0 0 .4rem .4rem;
+                            border-radius: 0 0 .2rem .2rem;
                             display: flex;
                             justify-content: center;
                             align-items: center;
@@ -459,6 +523,16 @@ export default {
 
                         
                     }
+                }
+                .moves{
+                    width: 100%;
+                    height: 100%;                    
+                    overflow-y: auto;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    padding: 10px;
+                    scrollbar-width: thin;
                 }
             }
         }

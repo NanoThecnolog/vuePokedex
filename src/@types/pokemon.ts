@@ -63,7 +63,7 @@ interface HeldItemsProps {
         }
     ]
 }
-interface MovesProps {
+export interface MovesProps {
     move: {
         name: string,
         url: string,
