@@ -15,11 +15,17 @@ export default {
   data() {
     return {
       pokemons: [] as PokemonProps[],
+      filteredPokemons: [] as PokemonProps[],
       pokemonImages: [] as string[],
       limit: 25,
       offset: 0,
       isLoading: false,
       scrollThreshold: 300,
+      filters: {
+        name: '',
+        id: null as number | null,
+        type: ''
+      }
       
     };
   },
@@ -30,7 +36,6 @@ export default {
       try {
         this.isLoading = true;        
         const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=${this.limit}&offset=${this.offset}`);
-        //this.pokemons = response.data.results;
         
         const pokemonDataPromises = response.data.results.map((pokemon: PokemonProps) => {
           return axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
@@ -40,6 +45,7 @@ export default {
         const pokemonData = responseData.map((pokemon) => pokemon.data)
 
         this.pokemons = [...this.pokemons, ...pokemonData];
+        this.applyFilters();
         this.offset += this.limit;
         
         //console.log(pokemonData)
@@ -48,7 +54,7 @@ export default {
         
       } finally {
         this.isLoading = false;
-      }
+      };
     },
     infinityScroll() {
       const scrollPosition = window.scrollY + window.innerHeight;
@@ -56,8 +62,26 @@ export default {
 
       if (pageHeight - scrollPosition < this.scrollThreshold) {
         this.fetchPokemon();
-      }
-    },    
+      };
+    },//aqui eu tenho que dar um jeito de buscar todos os pokemons e salvar num array de objetos pra aplicar o filtro nele
+    async applyFilters() {
+      const { name, id, type } = this.filters;
+      
+      this.filteredPokemons = this.pokemons.filter((pokemon: PokemonProps) => {
+        const matchesName = name ? pokemon.name.toLowerCase().includes(name.toLowerCase()) : true;
+        const matchesId = id ? pokemon.id === id : true;
+        const matchesType = type ? pokemon.types.some(t => t.type.name === type.toLowerCase()) : true;
+        return matchesName && matchesId && matchesType;
+      });
+    },
+    onFilterChange(filterData: {
+      name: string,
+      id: number | null,
+      type: string
+    }) {
+      this.filters = filterData;
+      this.applyFilters();
+    }
   },
   mounted() {
     this.fetchPokemon();
@@ -72,12 +96,15 @@ export default {
 
 <template>
   <header>
-    <Filtro/>
+    
   </header>
   <main class="container">
+    <section class="pokemonFilter">
+      <Filtro @filter="onFilterChange"/>
+    </section>
     <section class="pokemonsContainer">      
-      <div class="cardContainer" v-for="pokemon in pokemons" :key="pokemon.id">
-        <PokemonCard :pokemon="pokemon"/>               
+      <div class="cardContainer" v-for="pokemon in filteredPokemons" :key="pokemon.id">
+        <PokemonCard :pokemon="pokemon"/>           
       </div>
     </section>    
   </main>
@@ -92,6 +119,14 @@ export default {
   justify-content: flex-start;
   align-items: center;
   padding-top: 200px;
+
+  .pokemonFilter{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
 
   .pokemonsContainer {
     display: grid;
