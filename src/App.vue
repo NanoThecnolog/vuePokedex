@@ -21,7 +21,7 @@ export default {
       limit: 25,
       offset: 0,
       isLoading: false,
-      scrollThreshold: 300,
+      scrollHeight: 300,
       filters: {
         name: '',
         id: null as number | null,
@@ -68,13 +68,12 @@ export default {
       const scrollPosition = window.scrollY + window.innerHeight;
       const pageHeight = document.documentElement.scrollHeight;
 
-      if (pageHeight - scrollPosition < this.scrollThreshold) {
+      if (pageHeight - scrollPosition < this.scrollHeight) {
         this.fetchPokemon();
       };
-    },//aqui eu tenho que dar um jeito de buscar todos os pokemons e salvar num array de objetos pra aplicar o filtro nele
+    },
     applyFilters() {
-      const { name, id, type } = this.filters;
-      console.log(type);
+      const { name, id, type } = this.filters;      
       this.filteredPokemons = this.pokemons.filter((pokemon: PokemonProps) => {
         const matchesName = name ? pokemon.name.toLowerCase().includes(name.toLowerCase()) : true;
         const matchesId = id ? pokemon.id === id : true;

@@ -4,9 +4,10 @@ import type { PokemonProps } from '@/@types/pokemon';
 import PokemonModal from '../modals/PokemonModal/PokemonModal.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-
-
-
+import Image from '../ui/Image.vue';
+import PokeName from '../ui/PokeName.vue';
+import PokeID from '../ui/PokeID.vue';
+import FavoriteStar from '../ui/FavoriteStar.vue';
 
 const colors: Record<string,string> = {
   fire: '#EC8484',
@@ -32,7 +33,11 @@ const colors: Record<string,string> = {
 export default {
   components: {
     PokemonModal,
-      FontAwesomeIcon
+    FontAwesomeIcon,
+    Image,
+    PokeName,
+    PokeID,
+    FavoriteStar
     },
     props: {
     pokemon: {
@@ -55,6 +60,7 @@ export default {
       closeModal() {
         this.isVisible = false;
       },
+      /*
       addFavorite() {
         const favorites = JSON.parse(localStorage.getItem('pokeFavorites') || '[]');
         const pokemonIndex = favorites.findIndex((fav: PokemonProps) => fav.id === this.pokemon.id);
@@ -67,29 +73,34 @@ export default {
           localStorage.setItem('pokeFavorites', JSON.stringify(favorites));
           this.isFavorite = false;          
         }
-      }
+      }*/
     },
     mounted() {
       const favorites = JSON.parse(localStorage.getItem('pokeFavorites') || '[]');
       const isFav = favorites.some((fav: PokemonProps) => fav.id === this.pokemon.id);
-      this.isFavorite = isFav;
-      console.log(isFav)
+      this.isFavorite = isFav;      
     }
 }
 </script>
 <template>    
     <div class="card" :style="{ backgroundColor: colors[pokemon.types[0].type.name] || 'rgb(255, 146, 146)' }" @click="openModal">
         <div class="imageContainer">
-          <img class="image" v-if="pokemon.sprites.other.home.front_default" :src="pokemon.sprites.other.home.front_default" :alt="pokemon.name"/>
+          <Image
+          :condition="pokemon.sprites.other.home.front_default != null"
+          :pokemonImage="pokemon.sprites.other.home.front_default"
+          :pokemonAlt="pokemon.name"
+          />
         </div>          
-        <div class="infoContainer">            
-          <h1>{{ pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1) }}</h1>
-          <p>#{{ pokemon.id.toString().padStart(4, '0') }}</p>
+        <div class="infoContainer">
+          <PokeName :name="pokemon.name"/>
+          <PokeID :id="pokemon.id"/>
         </div>
         <div class="favoriteContainer" title="Adicionar aos favoritos">
-          <button type="button" class="favorite" @click.stop="addFavorite">
-            <FontAwesomeIcon :icon="faStar" :style="{ color: isFavorite ? '#ffba08' : '#f8f9fa'}"/>
-          </button>
+          <FavoriteStar
+          :isFavorite="isFavorite"
+          :pokemonId="pokemon.id"
+          :pokemonName="pokemon.name"
+          />
         </div>
     </div>
     <div class="modal">
@@ -121,18 +132,7 @@ export default {
         justify-content: center;
         align-items: center;
 
-        .image {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            border: none;
-            filter: drop-shadow(3px 1px 3px rgba(0, 0, 0, 0.5));
-            transition: 0.5s;
-
-            &:hover {
-                transform: scale(1.5);
-            }
-        }
+        
     }
 
     .infoContainer {
@@ -141,22 +141,7 @@ export default {
     }
     .favoriteContainer{      
       width: 100%;
-      padding-left: 20px;
-      button{
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        transition: .4s;
-
-        &:hover{
-          transform: scale(1.2);
-        }
-
-        svg{
-          font-size: 1.7rem;
-          color: var(--color-white);
-        }
-      }
+      padding-left: 20px;      
     }
 
 }

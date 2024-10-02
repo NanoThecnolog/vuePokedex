@@ -8,6 +8,16 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faMars } from '@fortawesome/free-solid-svg-icons';
 import { faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import Image from '@/components/ui/Image.vue';
+import PokeName from '@/components/ui/PokeName.vue';
+import PokeID from '@/components/ui/PokeID.vue';
+import PokeCrie from '@/components/ui/PokeCrie.vue';
+import PokeGender from '@/components/ui/PokeGender.vue';
+import PokeInfo from '@/components/ui/PokeInfo.vue';
+import PokeTypes from '@/components/ui/PokeTypes.vue';
+import PokeAbilities from '@/components/ui/PokeAbilities.vue';
+import PokeEvo from '@/components/ui/PokeEvo.vue';
+
 
 const colors: Record<string,string> = {
             fire: '#EC8484',
@@ -30,12 +40,19 @@ const colors: Record<string,string> = {
             normal: '#a8a878'
 }
 
-
-
 export default {
     components: {
         FontAwesomeIcon,
-        Moves
+        Moves,
+        Image,
+        PokeID,
+        PokeCrie,
+        PokeGender,
+        PokeInfo,
+        PokeName,
+        PokeTypes,
+        PokeAbilities,
+        PokeEvo
     },
     props: {
         pokemon: {
@@ -126,58 +143,43 @@ export default {
             <div class="pokemonInfo">
                 <div class="infoContainer">
                     <div class="pokemonId">
-                        <h3>#{{ pokemon.id.toString().padStart(4, '0') }}</h3>
-                    </div>
-                    
+                        <PokeID :id="pokemon.id"/>
+                    </div>                    
                     <div class="backImage">
-                        <div class="crie" @click="playCrie" v-if="pokemon.cries.latest">
-                            <audio ref="audioCrie" v-if="pokemon.cries.latest" :src="pokemon.cries.latest"></audio>
-                            <font-awesome-icon :icon="faVolumeHigh" />
-                        </div>
+                        <PokeCrie :crie="pokemon.cries.latest"/>
                         <div class="imageContainer" :style="{backgroundColor: colors[pokemon.types[0].type.name]}">
-                            <img class="pokemonImage" v-if="pokeImage != ''" :src="pokeImage" :alt="pokemon.name">
-                            <div class="gender">
-                                <font-awesome-icon v-if="male" :icon="faMars" />
-                                <font-awesome-icon v-if="!male" :icon="faVenus" />
-                            </div>
-                            <div class="moreInfo">
-                                <p>Altura: {{ pokemon.height / 10 }}m</p>
-                                <p>Peso: {{ pokemon.weight /10 }}kg</p>
-                            </div>
+                            <Image
+                                :condition="pokeImage != ''"
+                                :pokemonImage="pokeImage"
+                                :pokemonAlt="pokemon.name"
+                                class="pokemonImage"
+                            />
+                            <PokeGender :male="male" />                            
+                            <PokeInfo :height="pokemon.height" :weight="pokemon.weight"/>
                         </div>
                     </div>
                     <div class="pokemonName">
-                        <h2>{{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}}</h2>
+                        <PokeName :name="pokemon.name"/>                        
                         <h4>Exp. base: {{ pokemon.base_experience }}</h4>
                     </div>
-                    <div class="pokemonTypes">
-                        <p :style="{ backgroundColor: colors[pokemon.types[0].type.name] || '' }">{{ pokemon.types[0].type.name }}</p>
-                        <p :style="{ backgroundColor: colors[pokemon.types[1].type.name] || '' }" v-if="pokemon.types.length > 1">{{ pokemon.types[1].type.name }}</p>
-                    </div>
-                    <div style="display: flex;width: 100%;">
-                        <div class="pokemonAbilities">
-                            <h3>Habilidades</h3>
-                            <p>{{ pokemon.abilities[0].ability.name }}</p>
-                            <p v-if="pokemon.abilities.length > 1">{{ pokemon.abilities[1].ability.name }}</p>
-                        </div>
-                        <div class="genderOptions">
-                            <h3>Gênero</h3>
-                            <button @click="changeToMale" style="background-color: #a595ff; color: white"><font-awesome-icon :icon="faMars" /></button>
-                            <button @click="changeToFemale" style="background-color: #ff95d3;"><font-awesome-icon :icon="faVenus" /></button>
-                        </div>
-                    </div>
-                    
-                    
+                    <PokeTypes :typePrimary="pokemon.types[0].type.name" :typeSecondary="pokemon.types?.[1]?.type.name"/> 
+                    <PokeAbilities
+                        :changeToMale="changeToMale"
+                        :changeToFemale="changeToFemale"
+                        :ability="pokemon.abilities[0].ability.name"
+                        :abilityHidden="pokemon.abilities?.[1]?.ability.name"
+                        />                 
                 </div>
                 <div class="infoContainer">
-                    Evoluções
+                    <PokeEvo :evolutions="evolutions"/>
+                    <!--Evoluções
                     <div class="evoContainer">
                                                 
                         <div class="evo" v-for="evo in evolutions" :key="evo.id">                            
                             <img :src="evo.imageMale" :alt="evo.name" width="100px">
                             <p>#{{ evo.id.toString().padStart(4, '0') }} {{ evo.name }} </p>                            
                         </div>              
-                    </div>
+                    </div>-->
                     <div class="statusContainer">                        
                         <div class="stats" v-for="stat in pokemon.stats" :key="stat.stat.name">
                             <div class="statusTitle">
@@ -283,29 +285,8 @@ export default {
                     width: 100px;
                     border: 2px solid var(--color-red);
                     border-radius: 2rem;
-
                 }
-
-                .crie{
-                    position: absolute;
-                    top: 15%;
-                    left: 10%;
-                    cursor: pointer;
-                    background-color: white;                    
-                    color: var(--color-metalic);
-                    border: 2px solid var(--color-red);
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    transition: .4s;
-
-                    &:hover{
-                        transform: scale(1.2)
-                    }                    
-                }
+                
                 .backImage{
                     background: radial-gradient(circle, rgba(255,255,255, .3)10%, var(--color-metalic) 55%);
                     width: 100%;
@@ -320,48 +301,18 @@ export default {
                     width: 230px;
                     height: 230px;
 
-                    .pokemonImage{
-                        width: 200px;
-                        height: 200px;
-                        object-fit: contain;
-                        filter: drop-shadow(3px 1px 3px rgba(0, 0, 0, 0.5));
-                        transition: .4s;
+                        .pokemonImage{
+                            width: 200px;
+                            height: 200px;
+                            object-fit: contain;
+                            filter: drop-shadow(3px 1px 3px rgba(0, 0, 0, 0.5));
+                            transition: .4s;
 
-                        &:hover{
-                            transform: scale(1.2);
+                            &:hover{
+                                transform: scale(1.2);
+                            }
                         }
                     }
-                    .gender{
-                        position: absolute;
-                        bottom: 15%;
-                        left: 10%;
-                        font-size: 20px;
-                        background-color: var(--color-white);
-                        border: 2px solid var(--color-red);
-                        border-radius: 50%;
-                        width: 30px;
-                        height: 30px;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        color: var(--color-metalic);
-                        
-                    }
-                    .moreInfo{
-                        position: absolute;
-                        bottom: 0%;
-                        right: 10%;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: flex-end;    
-
-                        p{
-                            font-weight: 700;
-                            font-family: var(--font-Roboto);
-                            font-style: italic;
-                        }
-                    }                   
-                }
                 }
                 
                 .pokemonName{
@@ -374,71 +325,18 @@ export default {
                     justify-content: center;
                     align-items: center;                    
 
-                    h2{
+                    h1{
                         font-weight: 700;
                         font-family: sans-serif;
+                        font-size: 1.5rem;
+                        margin: 0;
                     }
                     h4{
                         font-weight: 700;
                     }
                 }
-                .pokemonTypes{
-                    width: 100%;
-                    height: 50px;
-                    display: flex;
-                    justify-content: space-around;    
-                    align-items: center;
-                    
-                    p{
-                        width: 200px;
-                        height: 40px;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        border-radius: 2rem;
-                        font-size: 1.2rem;    
-                    }
-                }
-                .pokemonAbilities{
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-around;
-                    align-items: center;
-                    width: 50%;
-                    padding-top: 5px;
-
-                    p{
-                        background-color: #b6c9f1;
-                        width: 80%;
-                        height: 40px;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        border-radius: 2rem;
-                    }
-                }                
-                .genderOptions{
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-around;
-                    align-items: center;
-                    width: 50%;
-                    gap: 12px;
-                    padding-top: 5px;
-
-                    button{
-                        border: none;
-                        border-radius: .4rem;
-                        padding: 7px 36px;
-                        font-size: 1.5rem;
-                        transition: .4s;
-                        cursor: pointer;
-
-                        &:hover{
-                            transform: scale(1.2);
-                        }
-                    }
-                }
+                
+                
                 .evoContainer{
                     width: 100%;
                     height: 100%;
