@@ -108,7 +108,7 @@ interface SpritesProps {
         }
     }
 }
-interface StatsProps {
+export interface StatsProps {
     base_stat: number,
     effort: number,
     stat: {

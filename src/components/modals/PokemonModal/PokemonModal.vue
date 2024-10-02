@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { PokemonProps } from '@/@types/pokemon';
-import Moves from './Moves.vue';
+import Moves from '@/components/ui/Moves.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faVenus } from '@fortawesome/free-solid-svg-icons';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -17,6 +17,7 @@ import PokeInfo from '@/components/ui/PokeInfo.vue';
 import PokeTypes from '@/components/ui/PokeTypes.vue';
 import PokeAbilities from '@/components/ui/PokeAbilities.vue';
 import PokeEvo from '@/components/ui/PokeEvo.vue';
+import PokeStatus from '@/components/ui/PokeStatus.vue';
 
 
 const colors: Record<string,string> = {
@@ -52,7 +53,8 @@ export default {
         PokeName,
         PokeTypes,
         PokeAbilities,
-        PokeEvo
+        PokeEvo,
+        PokeStatus
     },
     props: {
         pokemon: {
@@ -171,38 +173,13 @@ export default {
                         />                 
                 </div>
                 <div class="infoContainer">
-                    <PokeEvo :evolutions="evolutions"/>
-                    <!--Evoluções
-                    <div class="evoContainer">
-                                                
-                        <div class="evo" v-for="evo in evolutions" :key="evo.id">                            
-                            <img :src="evo.imageMale" :alt="evo.name" width="100px">
-                            <p>#{{ evo.id.toString().padStart(4, '0') }} {{ evo.name }} </p>                            
-                        </div>              
-                    </div>-->
-                    <div class="statusContainer">                        
-                        <div class="stats" v-for="stat in pokemon.stats" :key="stat.stat.name">
-                            <div class="statusTitle">
-                                <p>
-                                    {{ stat.stat.name === 'special-attack' ? 'SPA' :
-                                            stat.stat.name === 'special-defense' ? 'SPD' :
-                                                stat.stat.name === 'attack' ? 'ATK' :
-                                                    stat.stat.name === 'defense' ? 'DEF' :
-                                                        stat.stat.name === 'speed' ? 'SPD' :
-                                                            stat.stat.name.toUpperCase() }}
-                                </p>
-                            </div>
-                            <div class="values">
-                                <div class="colored" :style="{ height: stat.base_stat + 'px'}">
-                                    <p>{{ stat.base_stat }}</p>
-                                </div>                                
-                            </div>
-                        </div>                        
-                    </div>
+                    <PokeEvo :evolutions="evolutions"/> 
+                    <PokeStatus :status="pokemon.stats"/>
+                    
                 </div>
                 <div class="infoContainer">
                     <div class="moves">
-                        Movimentos:
+                        <h3>Movimentos:</h3>
                         <Moves v-for="(move, index) in pokemon.moves" :key="index" :moves="move"/>
                     </div>                    
                 </div>
@@ -288,7 +265,7 @@ export default {
                 }
                 
                 .backImage{
-                    background: radial-gradient(circle, rgba(255,255,255, .3)10%, var(--color-metalic) 55%);
+                    
                     width: 100%;
                     height: 400px;
                     display: flex;
@@ -365,57 +342,7 @@ export default {
                         }
                     }
                 }
-                .statusContainer{
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-evenly;
-                    align-items: center;                    
-                    border-radius: .4rem;                    
-                    padding: 5px;
-
-                    .stats{
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: space-between;
-                        align-items: center;
-                        text-align: center;
-                        //border: 1px solid red;
-                        height: 220px;
-                        width: 50px;
-                        background-color: #b6c9f1;
-                        border-radius: 2.5rem 2.5rem .4rem .4rem;
-
-                        .statusTitle{
-                            
-                            background-color: var(--color-celesticBlue);
-                            border-radius: 50%;
-                            width: 50px;
-                            height: 50px;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            
-                        }
-
-                        .values{
-                            //border: 1px solid red;
-                            width: 100%;
-                            
-                            .colored{
-                            background-color: #526886;
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 0 0 .2rem .2rem;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            color: white;
-                            }
-                        }
-
-                        
-                    }
-                }
+                
                 .moves{
                     width: 100%;
                     height: 100%;                    

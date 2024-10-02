@@ -3,6 +3,7 @@ import axios from 'axios';
 import type { PokemonProps } from './@types/pokemon';
 import PokemonCard from './components/PokemonCard/PokemonCard.vue';
 import Filtro from './components/Filtro/Filtro.vue';
+import { pokemonRequest } from './Services/pokemonRequests';
 
 
 
@@ -34,29 +35,23 @@ export default {
   methods: {
     async fetchAllPokemon() {
       try {
-        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=1500`);
-        this.allPokemons = response.data.results;
-        
+        const response = await pokemonRequest.getAllPokemon(1500)
+        this.allPokemons = response;
       } catch (err) {
         console.log("Erro ao buscar todos os pokemons", err)
-      }      
+      }
     },
     async fetchPokemon() {
       if (this.isLoading) return;
       try {
         this.isLoading = true;
-        const pokemonSlice = this.allPokemons.slice(this.offset, this.offset + this.limit)
-        const pokemonDataPromises = pokemonSlice.map((pokemon) => {
-          return axios.get(pokemon.url)
-        })
-        const responseData = await Promise.all(pokemonDataPromises);
-        const pokemonData = responseData.map((pokemon)=> pokemon.data)
+        const pokemonSlicer = this.allPokemons.slice(this.offset, this.offset + this.limit)
+        const pokemonUrls = pokemonSlicer.map(pokemon => pokemon.url)
+        const pokemonData = await pokemonRequest.getMultiplePokemonDetails(pokemonUrls)       
 
         this.pokemons = [...this.pokemons, ...pokemonData];
         this.applyFilters();
         this.offset += this.limit;
-        
-        //console.log(pokemonData)
       } catch (err) {
         console.log("Erro ao fazer a requisição", err)
         
@@ -124,9 +119,9 @@ export default {
     <section class="pokemonFilter">
       <Filtro @filter="onFilterChange" @filter-favorites="handleFavoritesFilter"/>
     </section>
-    <section class="pokemonsContainer">      
+    <section class="pokemonsContainer">
       <div class="cardContainer" v-for="pokemon in filteredPokemons" :key="pokemon.id">
-        <PokemonCard :pokemon="pokemon"/>           
+        <PokemonCard :pokemon="pokemon"/>
       </div>
     </section>    
   </main>
