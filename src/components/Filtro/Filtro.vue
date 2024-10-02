@@ -7,7 +7,8 @@ export default defineComponent({
         return {
             searchName: '' as string,
             searchId: null as number | null,
-            searchType: '' as string,
+            searchType1: '' as string,
+            searchType2: '' as string,
             types: [
                 "Fire",
                 "Grass",
@@ -36,13 +37,14 @@ export default defineComponent({
             this.$emit('filter', {
                 name: this.searchName,
                 id: this.searchId,
-                type: this.searchType
+                type: [this.searchType1, this.searchType2]
             })
         },
         showAllPokemons() {
             this.searchName = '',
             this.searchId = null,
-            this.searchType = '',
+            this.searchType1 = '',
+            this.searchType2 = '',
             this.$emit('filter', {
                 name: '',
                 id: '',
@@ -74,11 +76,23 @@ export default defineComponent({
             <input type="number" v-model="searchId" placeholder="Filter by ID" @input="applyFilter"/>
         </div>
         <div class="filtroTipo filter">
-            <h2>Tipos</h2>            
-            <select v-model="searchType" @change="applyFilter">
-                <option value="">Todos os Tipos</option>
-                <option v-for="type in types" :key="type" :value="type">{{type}}</option>
-            </select>
+            <h2>Tipos</h2>
+            <div class="types">
+                <div>
+                <h3>Tipo primário</h3>
+                <select v-model="searchType1" @change="applyFilter">
+                    <option value="">Todos os Tipos</option>
+                    <option v-for="type in types" :key="type" :value="type">{{type}}</option>
+                </select>
+            </div>
+            <div>
+                <h3>Tipo secundário</h3>
+                <select v-model="searchType2" @change="applyFilter">
+                    <option value="">Todos os Tipos</option>
+                    <option v-for="type in types" :key="type" :value="type">{{type}}</option>
+                </select>
+            </div>
+        </div>
         </div>
         <div class="buttonContainer">
             <button type="button" @click="showFavorites">
@@ -100,6 +114,10 @@ export default defineComponent({
     height: 100px; 
     gap: 12px;
 
+    .filtroTipo{
+        text-align: center;
+    }
+
     .filter{
 
         input{
@@ -117,6 +135,10 @@ export default defineComponent({
             &:focus{
                 outline: 3px solid var(--color-red);
             }
+        }
+        .types{
+            display: flex;
+            gap: 10px;
         }
     }
     .buttonContainer{

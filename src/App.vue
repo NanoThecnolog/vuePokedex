@@ -25,7 +25,7 @@ export default {
       filters: {
         name: '',
         id: null as number | null,
-        type: ''
+        type: [] as string[]
       }
       
     };
@@ -74,11 +74,21 @@ export default {
     },//aqui eu tenho que dar um jeito de buscar todos os pokemons e salvar num array de objetos pra aplicar o filtro nele
     applyFilters() {
       const { name, id, type } = this.filters;
-      
+      console.log(type);
       this.filteredPokemons = this.pokemons.filter((pokemon: PokemonProps) => {
         const matchesName = name ? pokemon.name.toLowerCase().includes(name.toLowerCase()) : true;
         const matchesId = id ? pokemon.id === id : true;
-        const matchesType = type ? pokemon.types.some(t => t.type.name === type.toLowerCase()) : true;
+
+        let matchesType = false;
+        if (type && type.length > 0) {
+          if (type.length === 1 || type[1] === '') {
+            matchesType = pokemon.types.some(t => t.type.name.toLowerCase() === type[0].toLowerCase())
+          } else if (type.length === 2) {
+            matchesType = type.every(tp => pokemon.types.some(t => t.type.name.toLowerCase() === tp.toLowerCase()))
+          }
+        } else {
+          matchesType = true;
+        }        
         return matchesName && matchesId && matchesType;
       });
     },
@@ -89,7 +99,7 @@ export default {
     onFilterChange(filterData: {
       name: string,
       id: number | null,
-      type: string
+      type: string[]
     }) {
       this.filters = filterData;
       this.applyFilters();
