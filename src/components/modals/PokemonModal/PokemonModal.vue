@@ -202,15 +202,9 @@ export default {
                     <div class="moves">
                         Movimentos:
                         <Moves v-for="(move, index) in pokemon.moves" :key="index" :moves="move"/>
-                    </div>
-                    <div>
-                        versões do jogo que aparece e os Ids de cada versão
-                    </div>
-                
-                
+                    </div>                    
                 </div>
             </div>
-            
         </div>
     </div>
 
@@ -450,8 +444,8 @@ export default {
                     height: 100%;
                     display: flex;                    
                     justify-content: space-evenly;
-                    align-items: center;                    
-                    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.05) 55%, transparent 65%);
+                    align-items: center;                
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.05) 45%, transparent 55%);
                     
                     
                     .evo{
@@ -488,7 +482,7 @@ export default {
                         align-items: center;
                         text-align: center;
                         //border: 1px solid red;
-                        height: 160px;
+                        height: 220px;
                         width: 50px;
                         background-color: #b6c9f1;
                         border-radius: 2.5rem 2.5rem .4rem .4rem;

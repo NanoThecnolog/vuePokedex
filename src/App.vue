@@ -14,6 +14,7 @@ export default {
   },
   data() {
     return {
+      allPokemons: [] as {name: string, url: string}[],
       pokemons: [] as PokemonProps[],
       filteredPokemons: [] as PokemonProps[],
       pokemonImages: [] as string[],
@@ -31,18 +32,25 @@ export default {
   },
   
   methods: {
+    async fetchAllPokemon() {
+      try {
+        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=1500`);
+        this.allPokemons = response.data.results;
+        
+      } catch (err) {
+        console.log("Erro ao buscar todos os pokemons", err)
+      }      
+    },
     async fetchPokemon() {
       if (this.isLoading) return;
       try {
-        this.isLoading = true;        
-        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=${this.limit}&offset=${this.offset}`);
-        
-        const pokemonDataPromises = response.data.results.map((pokemon: PokemonProps) => {
-          return axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
+        this.isLoading = true;
+        const pokemonSlice = this.allPokemons.slice(this.offset, this.offset + this.limit)
+        const pokemonDataPromises = pokemonSlice.map((pokemon) => {
+          return axios.get(pokemon.url)
         })
-        
-        const responseData = await Promise.all(pokemonDataPromises)
-        const pokemonData = responseData.map((pokemon) => pokemon.data)
+        const responseData = await Promise.all(pokemonDataPromises);
+        const pokemonData = responseData.map((pokemon)=> pokemon.data)
 
         this.pokemons = [...this.pokemons, ...pokemonData];
         this.applyFilters();
@@ -64,7 +72,7 @@ export default {
         this.fetchPokemon();
       };
     },//aqui eu tenho que dar um jeito de buscar todos os pokemons e salvar num array de objetos pra aplicar o filtro nele
-    async applyFilters() {
+    applyFilters() {
       const { name, id, type } = this.filters;
       
       this.filteredPokemons = this.pokemons.filter((pokemon: PokemonProps) => {
@@ -73,6 +81,10 @@ export default {
         const matchesType = type ? pokemon.types.some(t => t.type.name === type.toLowerCase()) : true;
         return matchesName && matchesId && matchesType;
       });
+    },
+    handleFavoritesFilter(event: {favorites: PokemonProps[]}) {
+      const favoritesIds = event.favorites.map(fav => fav.id)
+      this.filteredPokemons = this.pokemons.filter(pokemon => favoritesIds.includes(pokemon.id))  
     },
     onFilterChange(filterData: {
       name: string,
@@ -83,7 +95,8 @@ export default {
       this.applyFilters();
     }
   },
-  mounted() {
+  async mounted() {
+    await this.fetchAllPokemon();
     this.fetchPokemon();
     window.addEventListener('scroll', this.infinityScroll)
   },
@@ -100,7 +113,7 @@ export default {
   </header>
   <main class="container">
     <section class="pokemonFilter">
-      <Filtro @filter="onFilterChange"/>
+      <Filtro @filter="onFilterChange" @filter-favorites="handleFavoritesFilter"/>
     </section>
     <section class="pokemonsContainer">      
       <div class="cardContainer" v-for="pokemon in filteredPokemons" :key="pokemon.id">
@@ -136,6 +149,7 @@ export default {
 
     .cardContainer {
       cursor: pointer;
+      transition: .4s;
     }
   }
 }
