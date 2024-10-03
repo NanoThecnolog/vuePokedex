@@ -125,7 +125,7 @@ export default {
     
   </header>
   <main class="container">
-    <h1>Pokedex</h1>
+    <h1 class="pokedex">PoKeDeX</h1>
     <section class="pokemonFilter">
       <Filtro @filter="onFilterChange" @filter-favorites="handleFavoritesFilter"/>
     </section>
@@ -147,6 +147,14 @@ export default {
   align-items: center;
   padding-top: 200px;
 
+  .pokedex{
+    font-family: var(--font-Press-Start);
+    font-weight: 600;
+    font-size: 5rem;
+    color: var(--color-yellow);
+    -webkit-text-stroke: 5px var(--color-celesticBlue)
+  }
+
   .pokemonFilter{
     width: 100%;
     display: flex;
@@ -167,4 +175,28 @@ export default {
     }
   }
 }
+@media (max-width: 768px){
+  .container{
+    .pokedex{
+      font-size: 4rem;
+    }
+  }
+}
+@media(max-width: 480px){
+  .container{
+    .pokedex{
+      font-size: 3rem;
+      -webkit-text-stroke: 4px var(--color-celesticBlue)
+    }
+  }
+}
+@media(max-width: 375px){
+  .container{
+    .pokedex{
+      font-size: 2rem;
+      -webkit-text-stroke: 3px var(--color-celesticBlue)
+    }
+  }
+}
+
 </style>
