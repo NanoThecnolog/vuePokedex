@@ -221,6 +221,7 @@ export default {
             left: 1%;
             cursor: pointer;
             transition: .4s;
+            //z-index: 99;
 
             &:hover {
                 transform: scale(1.2);
