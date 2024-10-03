@@ -115,6 +115,7 @@ export default {
     
   </header>
   <main class="container">
+    <h1>Pokedex</h1>
     <section class="pokemonFilter">
       <Filtro @filter="onFilterChange" @filter-favorites="handleFavoritesFilter"/>
     </section>
