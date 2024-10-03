@@ -1,12 +1,8 @@
 <script lang="ts">
-import axios from 'axios';
 import type { PokemonProps } from './@types/pokemon';
 import PokemonCard from './components/PokemonCard/PokemonCard.vue';
 import Filtro from './components/Filtro/Filtro.vue';
 import { pokemonRequest } from './Services/pokemonRequests';
-
-
-
 
 export default {
   components: {
@@ -17,12 +13,11 @@ export default {
     return {
       allPokemons: [] as {name: string, url: string}[],
       pokemons: [] as PokemonProps[],
-      filteredPokemons: [] as PokemonProps[],
-      pokemonImages: [] as string[],
-      limit: 25,
-      offset: 0,
-      isLoading: false,
-      scrollHeight: 300,
+      filteredPokemons: [] as PokemonProps[],      
+      limit: 25,//determina a quantidade de Pokemon a ser carregada a cada carregamento do infinityScroll
+      offset: 0,//contador para controle
+      isLoading: false,//controle para a função de busca ser chamada corretamente, se acumular requisições
+      scrollHeight: 300,//altura limite da barra de rolagem para chamar a função infinityScroll
       filters: {
         name: '',
         id: null as number | null,
@@ -33,21 +28,27 @@ export default {
   },
   
   methods: {
+    //Busca inicial do nome e da url de cada pokemon
     async fetchAllPokemon() {
       try {
+        //Aqui utilizo o serviço que criei para buscar nome e url de Pokemon, aceitando um número como a quantidade a ser buscada
         const response = await pokemonRequest.getAllPokemon(1500)
         this.allPokemons = response;
       } catch (err) {
         console.log("Erro ao buscar todos os pokemons", err)
       }
     },
+    //Busca dos detalhes dos Pokemon
     async fetchPokemon() {
       if (this.isLoading) return;
       try {
         this.isLoading = true;
+        //Aqui estou cortando a lista com os nomes e urls dos Pokemon. offset e limit determinam onde será cortado
         const pokemonSlicer = this.allPokemons.slice(this.offset, this.offset + this.limit)
+        //Com uma nova lista resultante do corte que fiz, separo nome da url do Pokemon numa nova lista a ser passada a função de request
         const pokemonUrls = pokemonSlicer.map(pokemon => pokemon.url)
-        const pokemonData = await pokemonRequest.getMultiplePokemonDetails(pokemonUrls)       
+        //Aqui utilizo o serviço que criei para buscar detalhes de multiplos Pokemon, aceitando uma lista com as urls dos Pokemon
+        const pokemonData = await pokemonRequest.getMultiplePokemonDetails(pokemonUrls)   
 
         this.pokemons = [...this.pokemons, ...pokemonData];
         this.applyFilters();
@@ -59,6 +60,7 @@ export default {
         this.isLoading = false;
       };
     },
+    //Função do scroll infinito
     infinityScroll() {
       const scrollPosition = window.scrollY + window.innerHeight;
       const pageHeight = document.documentElement.scrollHeight;
@@ -67,6 +69,7 @@ export default {
         this.fetchPokemon();
       };
     },
+    //Função que aplica os filtros
     applyFilters() {
       const { name, id, type } = this.filters;      
       this.filteredPokemons = this.pokemons.filter((pokemon: PokemonProps) => {
@@ -74,7 +77,7 @@ export default {
         const matchesId = id ? pokemon.id === id : true;
 
         let matchesType = true;
-
+        //Aqui verifico a quantidade de tipos a serem filtrados
         if (type.length > 0 && (type[0] || type[1])) {
           const noEmptyTypes = type.filter(tp => tp);
           matchesType = noEmptyTypes.every(tp =>
@@ -85,10 +88,12 @@ export default {
         return matchesName && matchesId && matchesType;
       });
     },
+    //Função de apresentação dos Pokemon favoritos
     handleFavoritesFilter(event: {favorites: PokemonProps[]}) {
       const favoritesIds = event.favorites.map(fav => fav.id)
       this.filteredPokemons = this.pokemons.filter(pokemon => favoritesIds.includes(pokemon.id))  
     },
+    //Função chamada ao disparar evento filter no componente Filtro
     onFilterChange(filterData: {
       name: string,
       id: number | null,
@@ -99,11 +104,14 @@ export default {
     }
   },
   async mounted() {
+    
     await this.fetchAllPokemon();
     this.fetchPokemon();
+    //eventListener do scroll para a função infinityScroll
     window.addEventListener('scroll', this.infinityScroll)
   },
   beforeUnmount() {
+    //Retirando eventListener do scroll para a função infinityScroll ao desmontar componente 
     window.removeEventListener('scroll', this.infinityScroll)
   },
 
