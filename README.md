@@ -1,61 +1,79 @@
-# pokedex
+# Pokedex
 
-This template should help get you started developing with Vue 3 in Vite.
+Este é um projeto de Pokedex que lista todos os Pokémon existentes.
 
-## Recommended IDE Setup
+## A Aplicação
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Nesta aplicação, os usuários podem explorar todos os Pokémon disponíveis. A interface apresenta um quadro de cards que exibe a imagem, o ID de identificação e o nome de cada Pokémon.
 
-## Type Support for `.vue` Imports in TS
+### Funcionalidades
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- **Scroll Infinito**: Os primeiros Pokémon são carregados ao iniciar a página. À medida que o usuário rola para baixo, mais Pokémon são apresentados automaticamente, proporcionando uma navegação contínua.
+  
+- **Favoritos**: Os usuários podem marcar seus Pokémon favoritos clicando no ícone de favorito próximo ao ID do Pokémon. Os Pokémon favoritos são salvos em uma lista acessível ao clicar no botão "Favoritos", localizado ao lado dos filtros.
 
-## Customize configuration
+- **Filtragem**: É possível filtrar a lista de Pokémon por nome, ID e tipo (tanto tipos únicos quanto duplos).
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+- **Modal de Informações**: Ao clicar em um card de Pokémon, um modal se abrirá com informações detalhadas, incluindo altura, peso, tipos, habilidades, árvore evolutiva, status base, experiência base e movimentos que o Pokémon pode aprender. Os usuários também podem ouvir o som que o Pokémon faz e alternar a imagem do Pokémon entre as versões masculina e feminina, caso existam.
 
-## Project Setup
+## Instruções para Instalação do Projeto
+
+### Setup do Projeto
+
+Para instalar as dependências, execute:
 
 ```sh
 npm install
-```
 
-### Compile and Hot-Reload for Development
+```
+### Compilar para Ambiente de Desenvolvimento com Hot-Reload
 
 ```sh
 npm run dev
+
 ```
 
-### Type-Check, Compile and Minify for Production
+### Preparar para Ambiente de Produção
 
 ```sh
 npm run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+### Testes com Vitest
 
 ```sh
 npm run test:unit
 ```
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+### Testes End-to-End com Cypress
 
 ```sh
 npm run test:e2e:dev
 ```
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
+Embora essa opção seja mais rápida, recomenda-se executar testes de produção antes do deployment. Para isso, faça:
 
 ```sh
 npm run build
 npm run test:e2e
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+
+### Lint com ESLINT código:
 
 ```sh
 npm run lint
 ```
+
+
+
+## IDE Recomendadas
+
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (Desative o Vetur para evitar conflitos).
+
+## Suporte de Tipagem para .vue deve ser importado em arquivos TS
+
+Por padrão, o TypeScript não suporta tipagem para arquivos `.vue`. Para resolver isso, utilizamos `vue-tsc` em vez de tsc para verificação de tipagem. Nos editores, precisamos do [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) para que o TypeScript reconheça as tipagens de `.vue`.
+
+Nota: O TypeScript não pode lidar com informações de tipo para imports `.vue` por padrão, por isso substituímos o comando `.tsc` pelo `vue-tsc` para a verificação de tipos.
+Certifique-se de ter o Volar instalado para uma integração adequada com o TypeScript.
