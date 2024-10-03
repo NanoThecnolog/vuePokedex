@@ -73,7 +73,7 @@ npm run lint
 
 ## Suporte de Tipagem para .vue deve ser importado em arquivos TS
 
-Por padrão, o TypeScript não suporta tipagem para arquivos `.vue`. Para resolver isso, utilizamos `vue-tsc` em vez de tsc para verificação de tipagem. Nos editores, precisamos do [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) para que o TypeScript reconheça as tipagens de `.vue`.
+Por padrão, o TypeScript não suporta tipagem para arquivos `.vue`. Para resolver isso, utilizamos `vue-tsc` em vez de `tsc` para verificação de tipagem. Nos editores, precisamos do [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) para que o TypeScript reconheça as tipagens de `.vue`.
 
 Nota: O TypeScript não pode lidar com informações de tipo para imports `.vue` por padrão, por isso substituímos o comando `.tsc` pelo `vue-tsc` para a verificação de tipos.
 Certifique-se de ter o Volar instalado para uma integração adequada com o TypeScript.
