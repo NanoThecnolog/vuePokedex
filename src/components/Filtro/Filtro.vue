@@ -48,13 +48,15 @@ export default defineComponent({
             this.$emit('filter', {
                 name: '',
                 id: '',
-                type: []
+                type: [],
+                isLoading: false
             })
         },
         showFavorites() {
             const favorites = JSON.parse(localStorage.getItem('pokeFavorites') || '[]');
             this.$emit('filter-favorites', {
-                favorites: favorites
+                favorites: favorites,
+                isLoading: true
             })
         }
     }
@@ -73,7 +75,12 @@ export default defineComponent({
             </div>
         <div class="filtroNumero filter">
             <h2>Numero</h2>
-            <input type="number" v-model="searchId" placeholder="Filter by ID" @input="applyFilter"/>
+            <input
+                type="number"
+                v-model="searchId"
+                placeholder="Filter by ID"
+                @input="applyFilter"
+            />
         </div>
         <div class="filtroTipo filter">
             <h2>Tipos</h2>
@@ -108,10 +115,13 @@ export default defineComponent({
 
 .filtroContainer{
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
-    height: 100px; 
+    padding: 10px;
+    box-sizing: border-box;
+    height: 100%;
     gap: 12px;
 
     .filtroTipo{
@@ -119,8 +129,10 @@ export default defineComponent({
     }
 
     .filter{
-
-        input{
+        //flex: 1 1 100%;
+        //max-width: 100%;
+        //margin-bottom: 12px;
+        input, select{
             padding: 10px;
             border-radius: .4rem;
 
@@ -129,18 +141,13 @@ export default defineComponent({
                 outline: 3px solid var(--color-red);
             }
         }
-        select{
-            padding: 10px;
-            border-radius: .4rem;
-            &:focus{
-                outline: 3px solid var(--color-red);
-            }
-        }
         .types{
-            display: flex;
+            display: flex;            
             gap: 10px;
         }
     }
+        
+
     .buttonContainer{
         display: flex;
         gap: 10px;        
@@ -160,4 +167,29 @@ export default defineComponent({
         }
     }
 }
+//mobile
+//telas muito pequenas e telas padrão
+@media (max-width: 375px) {
+    .types{
+        flex-direction: column;
+        flex: 1 1 100%;
+    }
+    .buttonContainer{
+        flex-direction: column;        
+        align-items: center;
+        flex: 1 1 100%;      
+    }
+}
+//telas smartphone maiores
+@media (min-width: 375.1px) and (max-width: 560px) {}
+//Tablets
+//telas Tablets (disp. medios)
+@media (min-width: 560.1px) and (max-width: 768px) {}
+//Desktops/notebooks
+//telas notebooks e monitores pequenos
+@media (max-width: 1024px) {}
+@media (max-width: 1280px) {}
+//telas de monitores maiores
+@media (max-width: 1440px) {}
+@media (max-width: 1920px) {}
 </style>

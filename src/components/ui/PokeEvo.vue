@@ -65,4 +65,9 @@ export default {
             }
         }
     }
+    @media (max-width: 1024px){
+        .evoContainer{
+            background: transparent;
+        }
+    }
 </style>

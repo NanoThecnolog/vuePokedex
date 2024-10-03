@@ -89,7 +89,8 @@ export default {
       });
     },
     //Função de apresentação dos Pokemon favoritos
-    handleFavoritesFilter(event: {favorites: PokemonProps[]}) {
+    handleFavoritesFilter(event: { favorites: PokemonProps[], isLoading: boolean }) {
+      this.isLoading = event.isLoading
       const favoritesIds = event.favorites.map(fav => fav.id)
       this.filteredPokemons = this.pokemons.filter(pokemon => favoritesIds.includes(pokemon.id))  
     },
@@ -98,8 +99,9 @@ export default {
       name: string,
       id: number | null,
       type: string[]
-    }) {
+    }, isLoading: boolean) {
       this.filters = filterData;
+      this.isLoading = isLoading;      
       this.applyFilters();
     }
   },

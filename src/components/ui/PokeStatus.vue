@@ -58,7 +58,7 @@ export default {
                 
                 background-color: var(--color-celesticBlue);
                 border-radius: 50%;
-                width: 50px;
+                width: 100%;
                 height: 50px;
                 display: flex;
                 justify-content: center;
@@ -83,6 +83,57 @@ export default {
             }
 
             
+        }
+    }
+    @media(max-width: 1325px){
+        .statusContainer{            
+            .stats{            
+                width: 45px;
+                .statusTitle{
+                    height: 45px;
+                }
+            }
+        }
+    }
+    @media(max-width: 1024px){
+        .statusContainer{
+            .stats{
+                width: 70px;
+                .statusTitle{
+                    height: 70px;
+                }
+            }
+            
+        }
+    }
+    @media(max-width: 768px){
+        .statusContainer{
+            .stats{
+                width: 50px;
+                .statusTitle{
+                    height: 50px;
+                }
+            }
+        }
+    }
+    @media(max-width: 480px){
+        .statusContainer{
+            .stats{
+                width: 45px;
+                .statusTitle{
+                    height: 45px;
+                }
+            }
+        }
+    }
+    @media(max-width: 375px){
+        .statusContainer{
+            .stats{
+                width: 40px;
+                .statusTitle{
+                    height: 40px;
+                }
+            }
         }
     }
 </style>

@@ -7,7 +7,6 @@ import { faVenus } from '@fortawesome/free-solid-svg-icons';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faMars } from '@fortawesome/free-solid-svg-icons';
 import { faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
 import Image from '@/components/ui/Image.vue';
 import PokeName from '@/components/ui/PokeName.vue';
 import PokeID from '@/components/ui/PokeID.vue';
@@ -18,6 +17,7 @@ import PokeTypes from '@/components/ui/PokeTypes.vue';
 import PokeAbilities from '@/components/ui/PokeAbilities.vue';
 import PokeEvo from '@/components/ui/PokeEvo.vue';
 import PokeStatus from '@/components/ui/PokeStatus.vue';
+import { pokemonRequest } from '@/Services/pokemonRequests';
 
 
 
@@ -102,27 +102,23 @@ export default {
         },
         async fetchEvos() {
             try {
-                const specie = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${this.pokemon.id}/`);
-                const evoChain = await axios.get(specie.data.evolution_chain.url);
+                const specie = await pokemonRequest.getPokemonSpecie(this.pokemon.id);                
+                const evoChain = await pokemonRequest.getEvolutionChain(specie.evolution_chain.url);
                 
-                const chain = evoChain.data.chain;
+                const chain = evoChain.chain;
                 const evolutions: string[] = [
                     chain.species.name,
                     chain.evolves_to?.[0]?.species.name || null,
                     chain.evolves_to?.[0]?.evolves_to?.[0]?.species.name || null,
-                ].filter(Boolean)
-
-                const evoDataPromises = evolutions.map((pokemon) =>
-                    axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
-                );
-                const responseData = await Promise.all(evoDataPromises);
+                ].filter(Boolean)//Aqui removo valores nulos ou indefinidos
                 
-                const evos: EvosProps[] = responseData.map((chain) => {
+                const evoData = await pokemonRequest.getEvoPokemonDetails(evolutions)
+                const evos: EvosProps[] = evoData.map((chain) => {
                     return {
-                        id: chain.data.id,
-                        name: chain.data.name,
-                        imageMale: chain.data.sprites.other.home?.front_default || "",
-                        imageFemale: chain.data.sprites.other.home?.front_female || ""
+                        id: chain.id,
+                        name: chain.name,
+                        imageMale: chain.sprites.other.home?.front_default || "",
+                        imageFemale: chain.sprites.other.home?.front_female || ""
                     }
                 });
                 this.evolutions = evos;             
@@ -133,16 +129,13 @@ export default {
         }
     }
 }
-
 </script>
-
 <template>
     <div class="container">
         <div class="modalContainer">
             <button class="closeButton" @click='closeModal' type="button">
                 <font-awesome-icon :icon="faXmark" />
             </button>
-            
             <div class="pokemonInfo">
                 <div class="infoContainer">
                     <div class="pokemonId">
@@ -244,6 +237,7 @@ export default {
             gap: 20px;            
             width: 100%;
             height: 100%;
+            //flex-wrap: wrap;
 
             .infoContainer{
                 display: flex;
@@ -314,34 +308,7 @@ export default {
                 }
                 
                 
-                .evoContainer{
-                    width: 100%;
-                    height: 100%;
-                    display: flex;                    
-                    justify-content: space-evenly;
-                    align-items: center;                
-                    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.05) 45%, transparent 55%);
-                    
-                    
-                    .evo{
-                        display: flex;
-                        height: 100%;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-
-                        img{
-                            transition: .4s;
-                            &:hover{
-                                transform: scale(1.3);
-                            }
-                        }
-
-                        p{
-                            padding-top: 2rem;
-                        }
-                    }
-                }
+                
                 
                 .moves{
                     width: 100%;
@@ -355,6 +322,133 @@ export default {
                 }
             }
         }
+    }
+}
+/* Responsividade */
+@media(max-width: 1580px){
+    .container{
+        .modalContainer{
+            width: 95%;
+            .pokemonInfo{
+                .infoContainer{
+                    .moves{
+                        width: 90%;
+                    }
+                }
+            }
+        }
+    }
+}
+@media(max-width: 1325px){
+    .container{
+        .modalContainer{
+            width: 80%;
+            
+            .pokemonInfo{
+                .infoContainer{
+                    .moves{
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: 1024px){
+    .container{
+        .modalContainer {
+        width: 90%;
+        height: 95vh;
+        padding: 20px;
+            .pokemonInfo {
+                flex-direction: column;
+                gap: 10px;
+
+                .infoContainer {
+                    .backImage {
+                        height: 300px;
+
+                        .imageContainer {
+                            width: 180px;
+                            height: 180px;
+
+                            .pokemonImage {
+                                width: 160px;
+                                height: 160px;
+                            }
+                        }
+                    }
+                    .moves{
+                        display: none;
+                    }                    
+                }
+            }
+        }
+    }
+}
+@media (max-width: 768px) {
+    .container{
+        .modalContainer {
+        width: 90%;
+        height: 95vh;
+        padding: 20px;
+            .pokemonInfo {
+                flex-direction: column;
+                gap: 10px;
+
+                .infoContainer {
+                    .backImage {
+                        height: 300px;
+
+                        .imageContainer {
+                            width: 180px;
+                            height: 180px;
+
+                            .pokemonImage {
+                                width: 160px;
+                                height: 160px;
+                            }
+                        }
+                    }
+                    .moves{
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
+@media (max-width: 480px) {
+    .container{
+        .modalContainer {
+        width: 95%;
+        height: 90vh;
+        padding: 10px;
+
+        .pokemonInfo {
+            flex-direction: column;
+            gap: 10px;
+
+            .infoContainer {
+                .backImage {
+                    height: 250px;
+
+                    .imageContainer {
+                        width: 150px;
+                        height: 150px;
+
+                        .pokemonImage {
+                            width: 130px;
+                            height: 130px;
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
     }
 }
 </style>
