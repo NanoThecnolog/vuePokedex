@@ -59,21 +59,7 @@ export default {
       },
       closeModal() {
         this.isVisible = false;
-      },
-      /*
-      addFavorite() {
-        const favorites = JSON.parse(localStorage.getItem('pokeFavorites') || '[]');
-        const pokemonIndex = favorites.findIndex((fav: PokemonProps) => fav.id === this.pokemon.id);
-        if (pokemonIndex === -1) {
-          favorites.push({ id: this.pokemon.id, name: this.pokemon.name });          
-          localStorage.setItem('pokeFavorites', JSON.stringify(favorites));
-          this.isFavorite = true;          
-        } else {
-          favorites.splice(pokemonIndex, 1);
-          localStorage.setItem('pokeFavorites', JSON.stringify(favorites));
-          this.isFavorite = false;          
-        }
-      }*/
+      },      
     },
     mounted() {
       const favorites = JSON.parse(localStorage.getItem('pokeFavorites') || '[]');

@@ -169,8 +169,8 @@ export default {
                     <PokeAbilities
                         :changeToMale="changeToMale"
                         :changeToFemale="changeToFemale"
-                        :ability="pokemon.abilities[0].ability.name"
-                        :abilityHidden="pokemon.abilities?.[1]?.ability.name"
+                        :ability="pokemon.abilities?.[0]?.ability?.name"
+                        :abilityHidden="pokemon.abilities?.[1]?.ability?.name"
                         />                 
                 </div>
                 <div class="infoContainer">

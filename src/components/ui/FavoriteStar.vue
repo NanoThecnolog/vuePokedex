@@ -56,7 +56,7 @@ export default {
 </script>
 <template>
     <button type="button" class="favorite" @click.stop="addFavorite">
-            <FontAwesomeIcon :icon="faStar" :style="{ color: favorited ? '#ffba08' : '#f8f9fa'}"/>
+            <FontAwesomeIcon class="icon" :icon="faStar" :style="{ color: favorited ? '#ffba08' : '#f8f9fa'}"/>
     </button>
 
 </template>
