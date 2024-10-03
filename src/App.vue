@@ -73,16 +73,15 @@ export default {
         const matchesName = name ? pokemon.name.toLowerCase().includes(name.toLowerCase()) : true;
         const matchesId = id ? pokemon.id === id : true;
 
-        let matchesType = false;
-        if (type && type.length > 0) {
-          if (type.length === 1 || type[1] === '') {
-            matchesType = pokemon.types.some(t => t.type.name.toLowerCase() === type[0].toLowerCase())
-          } else if (type.length === 2) {
-            matchesType = type.every(tp => pokemon.types.some(t => t.type.name.toLowerCase() === tp.toLowerCase()))
-          }
-        } else {
-          matchesType = true;
-        }        
+        let matchesType = true;
+
+        if (type.length > 0 && (type[0] || type[1])) {
+          const noEmptyTypes = type.filter(tp => tp);
+          matchesType = noEmptyTypes.every(tp =>
+            pokemon.types.some(t => t.type.name.toLowerCase() === tp.toLowerCase())
+          )
+        }
+        
         return matchesName && matchesId && matchesType;
       });
     },

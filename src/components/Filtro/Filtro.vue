@@ -48,7 +48,7 @@ export default defineComponent({
             this.$emit('filter', {
                 name: '',
                 id: '',
-                type: ''
+                type: []
             })
         },
         showFavorites() {

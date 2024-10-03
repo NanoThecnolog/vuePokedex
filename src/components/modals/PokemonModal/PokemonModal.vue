@@ -20,6 +20,7 @@ import PokeEvo from '@/components/ui/PokeEvo.vue';
 import PokeStatus from '@/components/ui/PokeStatus.vue';
 
 
+
 const colors: Record<string,string> = {
             fire: '#EC8484',
             grass: '#8CC66D',
@@ -54,7 +55,8 @@ export default {
         PokeTypes,
         PokeAbilities,
         PokeEvo,
-        PokeStatus
+        PokeStatus,
+        
     },
     props: {
         pokemon: {
@@ -71,13 +73,12 @@ export default {
             colors,
             pokeImage: "",
             male: true,
-            evolutions: [] as EvosProps[]
-            
+            evolutions: [] as EvosProps[],
         }
     },
     mounted() {
         this.pokeImage = this.pokemon.sprites.other.home.front_default;
-        this.fetchEvos();        
+        this.fetchEvos();            
     },
     methods:{
         closeModal(){
@@ -157,8 +158,8 @@ export default {
                                 class="pokemonImage"
                             />
                             <PokeGender :male="male" />                            
-                            <PokeInfo :height="pokemon.height" :weight="pokemon.weight"/>
-                        </div>
+                            <PokeInfo :height="pokemon.height" :weight="pokemon.weight"/>                            
+                        </div>                       
                     </div>
                     <div class="pokemonName">
                         <PokeName :name="pokemon.name"/>                        
@@ -174,8 +175,7 @@ export default {
                 </div>
                 <div class="infoContainer">
                     <PokeEvo :evolutions="evolutions"/> 
-                    <PokeStatus :status="pokemon.stats"/>
-                    
+                    <PokeStatus :status="pokemon.stats"/>                  
                 </div>
                 <div class="infoContainer">
                     <div class="moves">
@@ -289,7 +289,7 @@ export default {
                                 transform: scale(1.2);
                             }
                         }
-                    }
+                    }                    
                 }
                 
                 .pokemonName{
