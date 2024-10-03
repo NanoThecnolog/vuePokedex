@@ -3,7 +3,6 @@ export interface PokemonProps {
     base_experience: number,
     cries: CriesProps,
     forms: FormsProps[],
-    game_indices: GameIndicesProps[],
     height: number,
     held_items: HeldItemsProps[],
     id: number,
@@ -12,12 +11,8 @@ export interface PokemonProps {
     moves: MovesProps[],
     name: string,
     order: number,
-    past_abilities: [
-
-    ],
-    past_types: [
-
-    ],
+    past_abilities: AbilitiesProps[],
+    past_types: TypesProps[],
     species: SpeciesProps,
     sprites: SpritesProps,
     stats: StatsProps[],
@@ -30,7 +25,7 @@ interface AbilitiesProps {
         name: string,
         url: string
     },
-    if_hidden: boolean,
+    is_hidden: boolean,
     slot: number
 }
 interface CriesProps {
@@ -41,13 +36,7 @@ interface FormsProps {
     name: string,
     url: string,
 }
-interface GameIndicesProps {
-    game_index: number,
-    version: {
-        name: string,
-        url: string
-    }
-}
+
 interface HeldItemsProps {
     item: {
         name: string,
@@ -68,19 +57,18 @@ export interface MovesProps {
         name: string,
         url: string,
     },
-    version_group_details: [
-        {
-            level_learned_at: number,
-            move_learn_method: {
-                name: string,
-                url: string
-            },
-            version_group: {
-                name: string,
-                url: string
-            }
+    version_group_details: {
+        level_learned_at: number,
+        move_learn_method: {
+            name: string,
+            url: string
+        },
+        version_group: {
+            name: string,
+            url: string
         }
-    ]
+    }[];
+
 }
 interface SpeciesProps {
     name: string,
