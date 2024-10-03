@@ -68,7 +68,7 @@ export default {
     }
 }
 </script>
-<template>    
+<template>
     <div class="card" :style="pokemon.types.length > 1
       ? { backgroundImage: `linear-gradient(45deg, ${colors[pokemon.types[0].type.name]} 40%, ${colors[pokemon.types[1].type.name]} 75%)` }
       : {backgroundColor: colors[pokemon.types[0].type.name] || 'rgba(255,146,146)'}" @click="openModal">
