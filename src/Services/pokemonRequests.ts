@@ -1,6 +1,6 @@
 import api from "./apiService";
 
-export const pokemonRequest = {
+class Pokemon {
     async getAllPokemon(limit: number) {
         try {
             const response = await api.get(`/pokemon?limit=${limit}`);
@@ -9,7 +9,7 @@ export const pokemonRequest = {
             console.error('Erro ao buscar todos os pokemons', err);
             throw err;
         }
-    },
+    }
     async getPokemonDetails(pokemonUrl: string) {
         try {
             const response = await api.get(pokemonUrl);
@@ -18,7 +18,7 @@ export const pokemonRequest = {
             console.error('Erro ao buscar detalhes do pokemon', err);
             throw err;
         }
-    },
+    }
     async getMultiplePokemonDetails(pokemonUrls: string[]) {
         try {
             //console.log(pokemonUrls)
@@ -29,7 +29,7 @@ export const pokemonRequest = {
             console.error('Erro ao buscar detalhes dos pokemons', err);
             throw err;
         }
-    },
+    }
     async getPokemonSpecie(pokemonId: number) {
         try {
             const response = await api.get(`/pokemon-species/${pokemonId}/`)
@@ -38,7 +38,7 @@ export const pokemonRequest = {
             console.error('Erro ao buscar a espécie do pokemon', err);
             throw err;
         }
-    },
+    }
     async getEvolutionChain(url: string) {
         try {
             //console.log(url)
@@ -48,7 +48,7 @@ export const pokemonRequest = {
             console.error('Erro ao buscar a cadeia de evolução', err);
             throw err;
         }
-    },
+    }
     async getEvoPokemonDetails(names: string[]) {
         try {
             const promises = names.map(name => api.get(`/pokemon/${name}`));
@@ -59,6 +59,6 @@ export const pokemonRequest = {
             throw err;
         }
     }
-
-
 }
+
+export const pokemonRequest = new Pokemon()

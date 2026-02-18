@@ -23,7 +23,6 @@ export default {
         id: null as number | null,
         type: [] as string[]
       }
-      
     };
   },
   
@@ -116,7 +115,6 @@ export default {
     //Retirando eventListener do scroll para a função infinityScroll ao desmontar componente 
     window.removeEventListener('scroll', this.infinityScroll)
   },
-
 };
 </script>
 
